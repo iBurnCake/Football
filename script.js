@@ -1,10 +1,10 @@
-// User profiles with updated passwords
+// User profiles
 const userProfiles = {
     "AngelaKant": "5353",
     "LukeRomano": "4242",
     "RyanSanders": "8989",
     "CharlesKeegan": "0000",
-    "WilliamMathis": "2222" // New user with updated password
+    "WilliamMathis": "2222" // New user added
 };
 
 // Fixed game data for Week 9
