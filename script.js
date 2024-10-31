@@ -1,92 +1,89 @@
-// User profiles
+// User profiles (username and password)
 const userProfiles = {
-    "AngelaKant": "5353",
-    "LukeRomano": "4242",
-    "RyanSanders": "8989",
-    "CharlesKeegan": "0000",
-    "WilliamMathis": "2222" // New user added
+    "AngelaKant": "KantAngela",
+    "LukeRomano": "RomanoLuke",
+    "RyanSanders": "SanderesRyan",
+    "CharlesKeegan": "KeeganCharles"
 };
 
-// Fixed game data for Week 9
-const games = [
-    { homeTeam: 'Texans', awayTeam: 'Jets', homeRecord: '6-2', awayRecord: '2-6' },
-    { homeTeam: 'Saints', awayTeam: 'Panthers', homeRecord: '2-6', awayRecord: '1-7' },
-    { homeTeam: 'Commanders', awayTeam: 'Giants', homeRecord: '6-2', awayRecord: '2-6' },
-    { homeTeam: 'Dolphins', awayTeam: 'Bills', homeRecord: '2-5', awayRecord: '6-2' },
-    { homeTeam: 'Chargers', awayTeam: 'Browns', homeRecord: '4-3', awayRecord: '2-6' },
-    { homeTeam: 'Patriots', awayTeam: 'Titans', homeRecord: '2-6', awayRecord: '1-6' },
-    { homeTeam: 'Cowboys', awayTeam: 'Falcons', homeRecord: '3-4', awayRecord: '5-3' },
-    { homeTeam: 'Raiders', awayTeam: 'Bengals', homeRecord: '2-6', awayRecord: '3-5' },
-    { homeTeam: 'Broncos', awayTeam: 'Ravens', homeRecord: '5-3', awayRecord: '5-3' },
-    { homeTeam: 'Bears', awayTeam: 'Cardinals', homeRecord: '4-3', awayRecord: '4-4' },
-    { homeTeam: 'Jaguars', awayTeam: 'Eagles', homeRecord: '2-6', awayRecord: '5-2' },
-    { homeTeam: 'Rams', awayTeam: 'Seahawks', homeRecord: '3-4', awayRecord: '4-4' },
-    { homeTeam: 'Lions', awayTeam: 'Packers', homeRecord: '6-1', awayRecord: '6-2' },
-    { homeTeam: 'Colts', awayTeam: 'Vikings', homeRecord: '4-4', awayRecord: '5-2' },
-    { homeTeam: 'Buccaneers', awayTeam: 'Chiefs', homeRecord: '4-4', awayRecord: '7-0' }
-];
-
-// Track user picks and assigned points
+// To store user picks and leaderboard
 let userPicks = {};
-let usedPoints = new Set();
+let assignedPoints = new Set();
+let leaderboard = [];
+let games = []; // Global variable to hold game details after fetching
 
-// Function to display games in the table
-function displayGames() {
+// Function to fetch NFL game data from the API
+async function fetchGameData() {
+    try {
+        const response = await fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events', {
+            headers: {
+                'x-api-key': 'cf87518a-2988-4c7b-8ac9-4443bb'
+            }
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch game events");
+
+        const data = await response.json();
+        
+        games = [];
+
+        for (let item of data.items) {
+            const gameResponse = await fetch(item.$ref);
+            const gameData = await gameResponse.json();
+
+            const game = {
+                homeTeam: gameData.competitions[0].competitors[0].team.displayName,
+                awayTeam: gameData.competitions[0].competitors[1].team.displayName,
+                date: gameData.date,
+                status: gameData.status.type.shortDetail
+            };
+
+            games.push(game);
+        }
+
+        displayGames(games);
+    } catch (error) {
+        console.error("Error fetching NFL data:", error);
+    }
+}
+
+// Function to display games on the page
+function displayGames(games) {
     const tableBody = document.getElementById('gamesTable').getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = ''; // Clear existing rows
+    tableBody.innerHTML = '';
 
     games.forEach((game, index) => {
         const row = tableBody.insertRow();
         row.innerHTML = `
-            <td>${game.homeTeam} (${game.homeRecord}) vs ${game.awayTeam} (${game.awayRecord})</td>
+            <td>${game.homeTeam} vs ${game.awayTeam}</td>
+            <td>${new Date(game.date).toLocaleString()}</td>
+            <td>${game.status}</td>
             <td>
-                <button onclick="selectPick(${index}, 'home')">${game.homeTeam}</button>
-                <button onclick="selectPick(${index}, 'away')">${game.awayTeam}</button>
+                <button onclick="pickGame(${index})">Pick</button>
             </td>
             <td>
-                <input type="number" id="confidence${index}" min="1" max="16" onchange="assignConfidence(${index})" required>
+                <input type="number" id="confidence${index}" min="1" max="15" required>
             </td>
         `;
     });
 }
 
-// Handle selection of a team
-function selectPick(gameIndex, team) {
-    userPicks[gameIndex] = { team, points: null };
-    alert(`You selected ${team} for game ${gameIndex + 1}`);
-}
-
-// Assign confidence points
-function assignConfidence(gameIndex) {
-    const confidenceInput = document.getElementById(`confidence${gameIndex}`);
-    const points = parseInt(confidenceInput.value);
-
-    if (usedPoints.has(points)) {
-        alert("This confidence point is already used. Choose a different one.");
-        confidenceInput.value = ''; // Clear duplicate entry
-    } else if (points >= 1 && points <= 16) {
-        usedPoints.add(points);
-        userPicks[gameIndex].points = points;
-        alert(`Assigned ${points} points to game ${gameIndex + 1}`);
-    } else {
-        alert("Please enter a value between 1 and 16.");
-    }
-}
-
-// Login function
+// Function to handle user login
 function login(username, password) {
     if (userProfiles[username] === password) {
         sessionStorage.setItem("loggedInUser", username);
-        document.getElementById('usernameDisplay').textContent = username;
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('userHomeSection').style.display = 'block';
-        displayGames();
+        document.getElementById('gamesSection').style.display = 'block';
+        document.getElementById('leaderboardSection').style.display = 'block';
+        document.getElementById('usernameDisplay').textContent = username;
+        fetchGameData();
     } else {
         alert("Invalid username or password.");
     }
 }
 
-// Handle login form submission
+// Function to handle login form submission
 function handleLogin(event) {
     event.preventDefault();
     const username = document.getElementById('username').value;
@@ -94,5 +91,5 @@ function handleLogin(event) {
     login(username, password);
 }
 
-// Set up form to trigger handleLogin on submission
+// Setup form to trigger handleLogin on submission
 document.querySelector("form").onsubmit = handleLogin;

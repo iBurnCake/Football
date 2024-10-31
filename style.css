@@ -12,81 +12,50 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-    flex-direction: column;
-    margin: 0; /* Remove default body margin to avoid off-centering */
-}
-
-/* Welcome Message Styling */
-#welcomeMessage {
-    font-size: 28px;
-    font-weight: bold;
-    color: #FFD700;
-    margin-bottom: 20px;
-    text-align: center;
+    height: 100vh;
 }
 
 /* Centered Login Container Styling */
-#loginSection {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
 .login-container {
     background-color: #282828;
     padding: 40px;
     border-radius: 8px;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     width: 100%;
     max-width: 400px;
     text-align: center;
 }
 
-.login-container h2 {
-    color: #FFD700;
+.login-container h1, h2 {
     margin-bottom: 20px;
+    color: #FFD700; /* NFL gold color */
 }
 
-label {
-    font-weight: bold;
-    color: #FFD700;
+label, input {
     display: block;
+    width: 100%;
+    margin-bottom: 15px;
     text-align: left;
-    margin-bottom: 5px;
 }
 
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 12px;
+input {
+    padding: 10px;
     font-size: 16px;
     border-radius: 4px;
-    border: 1px solid #ddd;
-    margin-bottom: 15px;
-    background-color: #1E1E1E;
-    color: #FFFFFF;
+    border: none;
     outline: none;
-    transition: border-color 0.3s;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus {
-    border-color: #3B7EED;
 }
 
 button {
     padding: 12px;
     width: 100%;
     font-size: 16px;
-    background-color: #3B7EED;
+    background-color: #3B7EED; /* NFL blue color */
     color: #FFFFFF;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-weight: bold;
 }
 
 button:hover {
@@ -96,16 +65,14 @@ button:hover {
 /* Games and Leaderboard Sections */
 section {
     width: 90%;
-    max-width: 1000px;
+    max-width: 800px;
     margin: 20px auto;
-    text-align: center;
 }
 
 h2 {
     color: #FFD700;
     text-align: center;
-    font-size: 24px;
-    font-weight: bold;
+    margin-top: 20px;
 }
 
 table {
@@ -116,14 +83,17 @@ table {
 
 th, td {
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
     background-color: #333;
-    color: #FFD700;
 }
 
 th {
     background-color: #444;
-    font-weight: bold;
+    color: #FFD700;
 }
 
+/* Hide initial sections */
+#userHomeSection, #gamesSection, #leaderboardSection {
+    display: none;
+}
