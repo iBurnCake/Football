@@ -83,13 +83,27 @@ function login(username, password) {
     }
 }
 
-// Function to handle login form submission
+// Handle login form submission
 function handleLogin(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevents the form from submitting and refreshing the page
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    login(username, password);
+    login(username, password); // Calls the login function
 }
 
-// Setup form to trigger handleLogin on submission
+// User login function
+function login(username, password) {
+    if (userProfiles[username] === password) {
+        sessionStorage.setItem("loggedInUser", username); // Store the username
+        document.getElementById('usernameDisplay').textContent = username;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('userHomeSection').style.display = 'block';
+        displayGames(); // Display the games section
+    } else {
+        alert("Invalid username or password.");
+    }
+}
+
+// Attach handleLogin to the form submission
 document.querySelector("form").onsubmit = handleLogin;
+
